@@ -1,3 +1,20 @@
 spring:
+  profiles:
+    active: db, s3
+
   application:
     name: makao-api
+
+  # [Todo] 로그에 실행 속도도 작성하기
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        # format_sql: true # SQL 포맷팅
+        highlight_sql: true
+
+# 로그 레벨 설정 [Todo] 환경에 따라 설정 변경하기
+logging:
+  level:
+    root: INFO
+    kr.co.makao: DEBUG

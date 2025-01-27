@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+docker-compose.dev.yml
+/minio-data/
+/postgres-data/
+
+### Application yml ###
+application-db.yml
+application-s3.yml
