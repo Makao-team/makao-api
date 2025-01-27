@@ -1,0 +1,21 @@
+name: App CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-common-tests:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Clean and test task
+        run: ./gradlew clean test
