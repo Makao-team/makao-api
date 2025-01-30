@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  run-common-tests:
-    name: Test
+  run-unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -17,5 +17,19 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Clean and test task
-        run: ./gradlew clean test
+      - name: Clean and unit test
+        run: ./gradlew clean unitTest
+
+  run-integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Clean and integration test
+        run: ./gradlew clean integrationTest

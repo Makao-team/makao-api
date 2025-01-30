@@ -21,6 +21,8 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+@Tag("integration")
 @ExtendWith({SpringExtension.class})
 @SpringBootTest(classes = MakaoApplication.class)
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class, DataSourceAutoConfiguration.class})
