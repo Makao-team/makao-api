@@ -1,7 +1,7 @@
 package kr.co.makao.integration.client;
 
 import kr.co.makao.MakaoApplication;
-import kr.co.makao.client.MinIOImageClient;
+import kr.co.makao.client.ImageClientImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith({SpringExtension.class})
 @SpringBootTest(classes = MakaoApplication.class)
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class, DataSourceAutoConfiguration.class})
-class MinIOImageClientTest {
+class ImageClientImplTest {
     private static final GenericContainer<?> MINIO_CONTAINER =
             new GenericContainer<>(DockerImageName.parse("minio/minio:latest"))
                     .withEnv("MINIO_ACCESS_KEY", "testAccessKey")
@@ -34,7 +34,7 @@ class MinIOImageClientTest {
                     .waitingFor(Wait.forHttp("/minio/health/ready").forStatusCode(200));
     private static final String bucketName = "test-bucket";
     @Autowired
-    private MinIOImageClient minIOImageClient;
+    private ImageClientImpl imageClientImpl;
 
     @BeforeAll
     static void setUp() {
@@ -58,22 +58,22 @@ class MinIOImageClientTest {
 
     @BeforeEach
     void createBucket() {
-        minIOImageClient.createBucket(bucketName);
+        imageClientImpl.createBucket(bucketName);
     }
 
     @AfterEach
     void deleteAll() {
-        minIOImageClient.deleteAll();
-        minIOImageClient.deleteBucket(bucketName);
+        imageClientImpl.deleteAll();
+        imageClientImpl.deleteBucket(bucketName);
     }
 
     @Nested
     class createBucket {
         @Test
         void createBucket_성공() {
-            minIOImageClient.createBucket("test-bucket-2");
+            imageClientImpl.createBucket("test-bucket-2");
 
-            assertTrue(minIOImageClient.existsBucket("test-bucket-2"));
+            assertTrue(imageClientImpl.existsBucket("test-bucket-2"));
         }
     }
 
@@ -81,10 +81,10 @@ class MinIOImageClientTest {
     class deleteBucket {
         @Test
         void deleteBucket_성공() {
-            minIOImageClient.createBucket("test-bucket-2");
-            minIOImageClient.deleteBucket("test-bucket-2");
+            imageClientImpl.createBucket("test-bucket-2");
+            imageClientImpl.deleteBucket("test-bucket-2");
 
-            assertFalse(minIOImageClient.existsBucket("test-bucket-2"));
+            assertFalse(imageClientImpl.existsBucket("test-bucket-2"));
         }
     }
 
@@ -97,7 +97,7 @@ class MinIOImageClientTest {
                     "test-upload.txt", "test-upload.txt", "text/plain", "test content".getBytes()
             );
 
-            String result = minIOImageClient.upload(file, key);
+            String result = imageClientImpl.upload(file, key);
 
             assertEquals(key, result);
         }
@@ -109,9 +109,9 @@ class MinIOImageClientTest {
                     "test-upload.txt", "test-upload.txt", "text/plain", "test content".getBytes()
             );
 
-            minIOImageClient.upload(file, key);
+            imageClientImpl.upload(file, key);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> minIOImageClient.upload(file, key));
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClientImpl.upload(file, key));
             assertTrue(exception.getMessage().contains("DUPLICATE_IMAGE_KEY"));
         }
     }
@@ -125,8 +125,8 @@ class MinIOImageClientTest {
                     "test-find.txt", "test-find.txt", "text/plain", "test content".getBytes()
             );
 
-            minIOImageClient.upload(file, key);
-            URL url = minIOImageClient.find(key);
+            imageClientImpl.upload(file, key);
+            URL url = imageClientImpl.find(key);
 
             assertNotNull(url);
             assertTrue(url.toString().contains(key));
@@ -136,7 +136,7 @@ class MinIOImageClientTest {
         void find_키_없음_실패() {
             String key = "test-find.txt";
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> minIOImageClient.find(key));
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClientImpl.find(key));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }
@@ -150,10 +150,10 @@ class MinIOImageClientTest {
                     "test-delete.txt", "test-delete.txt", "text/plain", "test content".getBytes()
             );
 
-            minIOImageClient.upload(file, key);
-            minIOImageClient.delete(key);
+            imageClientImpl.upload(file, key);
+            imageClientImpl.delete(key);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> minIOImageClient.find(key));
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClientImpl.find(key));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
 
@@ -161,7 +161,7 @@ class MinIOImageClientTest {
         void delete_키_없음_실패() {
             String key = "test-delete.txt";
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> minIOImageClient.delete(key));
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClientImpl.delete(key));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }
@@ -176,10 +176,10 @@ class MinIOImageClientTest {
                     "test-deleteAll.txt", "test-deleteAll.txt", "text/plain", "test content".getBytes()
             );
 
-            minIOImageClient.upload(file, key);
-            minIOImageClient.deleteAll();
+            imageClientImpl.upload(file, key);
+            imageClientImpl.deleteAll();
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> minIOImageClient.find(key));
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClientImpl.find(key));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }

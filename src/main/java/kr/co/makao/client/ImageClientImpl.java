@@ -5,23 +5,15 @@ import io.minio.http.Method;
 import io.minio.messages.Item;
 import kr.co.makao.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-
-@Component
 @RequiredArgsConstructor
-public class MinIOImageClient implements ImageClient {
+public class ImageClientImpl implements ImageClient, BucketClient {
     private final MinioClient minio;
-
-    @Value("${minio.bucket-name}")
     private String bucketName;
-
-    @Value("${minio.url-expiration-hours}")
     private int urlExpirationHours;
 
     @Override
@@ -70,7 +62,6 @@ public class MinIOImageClient implements ImageClient {
         if (exists(key))
             throw ApiException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
         try (var inputStream = file.getInputStream()) {
-
             minio.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(key)
@@ -122,11 +113,10 @@ public class MinIOImageClient implements ImageClient {
                     .bucket(bucketName)
                     .build());
 
-            for (Result<Item> result : results)
+            for (Result<Item> result : results) {
                 delete(result.get().objectName());
-
+            }
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("IMAGE_DELETE_FAILED", e);
         }
     }
