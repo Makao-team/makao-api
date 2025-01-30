@@ -18,4 +18,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Clean and test task
-        run: ./gradlew clean test
+        run: APP_INTEGRATION_TEST_ADDITIONAL_PROFILE=postgre ./gradlew clean test
