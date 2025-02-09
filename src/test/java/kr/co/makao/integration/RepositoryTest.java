@@ -14,14 +14,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Import(TestJpaConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest(
-    properties = {
-        "logging.level.org.springframework.jdbc.datasource.init=DEBUG",
-        "spring.jpa.hibernate.ddl-auto=none",
-        "spring.sql.init.mode=always",
-    }
+        properties = {
+                "logging.level.org.springframework.jdbc.datasource.init=DEBUG",
+                "spring.jpa.hibernate.ddl-auto=none",
+                "spring.sql.init.mode=always",
+        }
 )
 public abstract class RepositoryTest {
-
     @Autowired
     protected TestEntityManager em;
 
