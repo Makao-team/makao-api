@@ -1,6 +1,5 @@
-package kr.co.makao.integration;
+package kr.co.makao;
 
-import kr.co.makao.EnableCommonJpa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
