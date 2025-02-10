@@ -5,53 +5,18 @@ import io.minio.http.Method;
 import io.minio.messages.Item;
 import kr.co.makao.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-
-@Component
+@Slf4j
 @RequiredArgsConstructor
-public class MinIOImageClient implements ImageClient {
+public class ImageClientImpl implements ImageClient {
     private final MinioClient minio;
-
-    @Value("${minio.bucket-name}")
-    private String bucketName;
-
-    @Value("${minio.url-expiration-hours}")
-    private int urlExpirationHours;
-
-    @Override
-    public void createBucket(String bucketName) {
-        try {
-            if (!existsBucket(bucketName)) {
-                minio.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("BUCKET_CREATION_FAILED", e);
-        }
-    }
-
-    @Override
-    public void deleteBucket(String bucketName) {
-        try {
-            minio.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
-        } catch (Exception e) {
-            throw new RuntimeException("BUCKET_DELETION_FAILED", e);
-        }
-    }
-
-    @Override
-    public boolean existsBucket(String bucketName) {
-        try {
-            return minio.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-        } catch (Exception e) {
-            throw new RuntimeException("BUCKET_NOT_FOUND", e);
-        }
-    }
+    private final String bucketName;
+    private final int urlExpirationHours;
 
     @Override
     public boolean exists(String key) {
@@ -70,7 +35,6 @@ public class MinIOImageClient implements ImageClient {
         if (exists(key))
             throw ApiException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
         try (var inputStream = file.getInputStream()) {
-
             minio.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(key)
@@ -79,7 +43,8 @@ public class MinIOImageClient implements ImageClient {
                     .build());
             return key;
         } catch (Exception e) {
-            throw new RuntimeException("IMAGE_UPLOAD_FAILED", e);
+            log.error("IMAGE_UPLOAD_FAILED", e);
+            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_UPLOAD_FAILED");
         }
     }
 
@@ -97,7 +62,8 @@ public class MinIOImageClient implements ImageClient {
                             .build()
             ));
         } catch (Exception e) {
-            throw new RuntimeException("IMAGE_FIND_FAILED", e);
+            log.error("IMAGE_FIND_FAILED", e);
+            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED");
         }
     }
 
@@ -111,7 +77,8 @@ public class MinIOImageClient implements ImageClient {
                     .object(key)
                     .build());
         } catch (Exception e) {
-            throw new RuntimeException("IMAGE_DELETE_FAILED", e);
+            log.error("IMAGE_DELETE_FAILED", e);
+            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED");
         }
     }
 
@@ -122,12 +89,12 @@ public class MinIOImageClient implements ImageClient {
                     .bucket(bucketName)
                     .build());
 
-            for (Result<Item> result : results)
+            for (Result<Item> result : results) {
                 delete(result.get().objectName());
-
+            }
         } catch (Exception e) {
-            System.out.println(e);
-            throw new RuntimeException("IMAGE_DELETE_FAILED", e);
+            log.error("IMAGE_DELETE_FAILED", e);
+            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED");
         }
     }
 }

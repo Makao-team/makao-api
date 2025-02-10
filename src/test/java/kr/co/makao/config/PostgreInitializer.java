@@ -1,4 +1,4 @@
-package kr.co.makao.integration.config;
+package kr.co.makao.config;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -35,13 +35,11 @@ public class PostgreInitializer implements ApplicationContextInitializer<Configu
             }
 
             TestPropertyValues.of(
-                    "eco.datasource.read.hikari.jdbc-url=" + container.getJdbcUrl(),
-                    "eco.datasource.read.hikari.username=" + container.getUsername(),
-                    "eco.datasource.read.hikari.password=" + container.getPassword(),
-                    "eco.datasource.write.hikari.jdbc-url=" + container.getJdbcUrl(),
-                    "eco.datasource.write.hikari.username=" + container.getUsername(),
-                    "eco.datasource.write.hikari.password=" + container.getPassword(),
-                    "spring.jpa.properties.hibernate.dialects=org.hibernate.dialect.PostgreSQLDialect"
+                    "spring.datasource.url=" + container.getJdbcUrl(),
+                    "spring.datasource.username=" + container.getUsername(),
+                    "spring.datasource.password=" + container.getPassword(),
+                    "spring.datasource.driver-class-name=org.postgresql.Driver",
+                    "spring.jpa.hibernate.ddl-auto=none"
             ).applyTo(applicationContext.getEnvironment());
         }
     }

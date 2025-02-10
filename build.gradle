@@ -29,6 +29,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:postgresql'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    runtimeOnly("com.h2database:h2")
 }
 
 tasks.named('test') {
