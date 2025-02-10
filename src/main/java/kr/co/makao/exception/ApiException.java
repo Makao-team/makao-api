@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 public enum ApiException {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "BAD_REQUEST"),
     ID_NOT_FOUND(HttpStatus.BAD_REQUEST, "ID_NOT_FOUND"),
-    PRODUCT_ALREADY_ACTIVATED(HttpStatus.BAD_REQUEST, "PRODUCT_ALREADY_ACTIVATED");
+    PRODUCT_ALREADY_ACTIVATED(HttpStatus.BAD_REQUEST, "PRODUCT_ALREADY_ACTIVATED"),
+    IMAGE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_SERVER_ERROR");
 
     private final HttpStatus status;
     private final String message;

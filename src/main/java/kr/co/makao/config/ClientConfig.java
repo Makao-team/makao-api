@@ -7,21 +7,14 @@ import kr.co.makao.client.NoOpImageClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ClientConfig {
-
     private static final Logger logger = LoggerFactory.getLogger(ClientConfig.class);
 
-    /**
-     * MinIO 클라이언트 빈 등록
-     * - 설정값이 없을 경우 기본 테스트용 값을 가진 MinIO 클라이언트를 반환하여 NPE 방지
-     */
     @Bean
-    @ConditionalOnMissingBean(MinioClient.class)
     public MinioClient minioClient(
             @Value("${minio.endpoint:}") String endpoint,
             @Value("${minio.access-key:}") String accessKey,
@@ -41,7 +34,6 @@ public class ClientConfig {
     }
 
     @Bean
-    @ConditionalOnMissingBean(ImageClient.class)
     public ImageClient imageClient(
             MinioClient minioClient,
             @Value("${minio.bucket-name:}") String bucketName,
@@ -51,6 +43,6 @@ public class ClientConfig {
             logger.warn("MinIO 설정값이 없으므로 NoOpImageClientImpl을 사용합니다.");
             return new NoOpImageClientImpl();
         }
-        return new ImageClientImpl(minioClient);
+        return new ImageClientImpl(minioClient, bucketName, urlExpirationHours);
     }
 }

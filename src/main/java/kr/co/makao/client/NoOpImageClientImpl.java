@@ -1,11 +1,15 @@
 package kr.co.makao.client;
 
+import kr.co.makao.exception.ApiException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
-import java.net.URL;
+
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Slf4j
 public class NoOpImageClientImpl implements ImageClient {
     private final ConcurrentMap<String, String> storage = new ConcurrentHashMap<>();
 
@@ -16,6 +20,8 @@ public class NoOpImageClientImpl implements ImageClient {
 
     @Override
     public String upload(MultipartFile file, String key) {
+        if (exists(key))
+            throw ApiException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
         storage.put(key, "mock-url/" + key);
         return key;
     }
@@ -23,16 +29,24 @@ public class NoOpImageClientImpl implements ImageClient {
     @Override
     public URL find(String key) {
         if (!exists(key))
-            throw new RuntimeException("IMAGE_NOT_FOUND");
+            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         try {
             return new URL("http://localhost:8080/" + key);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("INVALID_URL", e);
+            log.error("IMAGE_FIND_FAILED", e);
+            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED");
         }
     }
 
     @Override
     public void delete(String key) {
+        if (!exists(key))
+            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         storage.remove(key);
+    }
+
+    @Override
+    public void deleteAll() {
+        storage.clear();
     }
 }
