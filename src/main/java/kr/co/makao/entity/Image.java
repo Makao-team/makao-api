@@ -1,6 +1,7 @@
 package kr.co.makao.entity;
 
 import jakarta.persistence.*;
+import kr.co.makao.annotation.EngDigitIdGenerator;
 import kr.co.makao.entity.base.TimeStamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +19,7 @@ public class Image extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    /**
-     * (Upper)Eng-Digit code
-     */
+    @EngDigitIdGenerator(length = 8)
     @Column(nullable = false, unique = true, length = 8)
     private String key;
 
