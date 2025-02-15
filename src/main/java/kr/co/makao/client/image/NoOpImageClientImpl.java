@@ -40,7 +40,7 @@ public class NoOpImageClientImpl implements ImageClient {
     @Override
     public void delete(String key) {
         if (!exists(key))
-            throw CommonException.BAD_REQUEST.toException("IMAGE_DELETE_FAILED");
+            throw CommonException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         storage.remove(key);
     }
 

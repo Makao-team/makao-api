@@ -2,6 +2,7 @@ package kr.co.makao.client.image;
 
 import kr.co.makao.config.ClientConfig;
 import kr.co.makao.config.MinioInitializer;
+import kr.co.makao.exception.CommonExceptionImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class ImageClientImplTest {
         void upload_중복키_실패() {
             imageClient.upload(FILE, KEY);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClient.upload(FILE, KEY));
+            CommonExceptionImpl exception = assertThrows(CommonExceptionImpl.class, () -> imageClient.upload(FILE, KEY));
             assertTrue(exception.getMessage().contains("DUPLICATE_IMAGE_KEY"));
         }
     }
@@ -60,7 +61,7 @@ class ImageClientImplTest {
 
         @Test
         void find_키_없음_실패() {
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClient.find(KEY));
+            CommonExceptionImpl exception = assertThrows(CommonExceptionImpl.class, () -> imageClient.find(KEY));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }
@@ -72,13 +73,14 @@ class ImageClientImplTest {
             imageClient.upload(FILE, KEY);
             imageClient.delete(KEY);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClient.find(KEY));
+            CommonExceptionImpl exception = assertThrows(CommonExceptionImpl.class, () -> imageClient.find(KEY));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
 
         @Test
         void delete_키_없음_실패() {
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClient.delete(KEY));
+
+            CommonExceptionImpl exception = assertThrows(CommonExceptionImpl.class, () -> imageClient.delete(KEY));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }
@@ -91,7 +93,7 @@ class ImageClientImplTest {
             imageClient.upload(FILE, KEY);
             imageClient.deleteAll();
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> imageClient.find(KEY));
+            CommonExceptionImpl exception = assertThrows(CommonExceptionImpl.class, () -> imageClient.find(KEY));
             assertTrue(exception.getMessage().contains("IMAGE_NOT_FOUND"));
         }
     }

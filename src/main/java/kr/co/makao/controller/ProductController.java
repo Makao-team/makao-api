@@ -21,7 +21,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{code}")
-    ResponseEntity<CommonResponse<String>> patchProduct(@PathVariable String code, @ModelAttribute ProductDTO.PatchRequest dto) {
+    ResponseEntity<CommonResponse<String>> patchProduct(@PathVariable("code") String code, @ModelAttribute ProductDTO.PatchRequest dto) {
         return CommonResponse.success(productService.patch(code, dto));
     }
 }
