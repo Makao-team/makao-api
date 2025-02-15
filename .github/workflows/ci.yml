@@ -23,9 +23,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Clean and test task
-        env:
-          APP_INTEGRATION_TEST_ADDITIONAL_PROFILE: postgre
-          APP_INTEGRATION_TEST_OBJECT_STORAGE_PROFILE: minio
         run: ./gradlew clean test
 
 

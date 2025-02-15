@@ -1,9 +1,9 @@
-package kr.co.makao.client;
+package kr.co.makao.client.image;
 
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.Item;
-import kr.co.makao.exception.ApiException;
+import kr.co.makao.exception.CommonException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +33,7 @@ public class ImageClientImpl implements ImageClient {
     @Override
     public String upload(MultipartFile file, String key) {
         if (exists(key))
-            throw ApiException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
+            throw CommonException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
         try (var inputStream = file.getInputStream()) {
             minio.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -42,16 +42,15 @@ public class ImageClientImpl implements ImageClient {
                     .contentType(file.getContentType())
                     .build());
             return key;
-        } catch (Exception e) {
-            log.error("IMAGE_UPLOAD_FAILED", e);
-            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_UPLOAD_FAILED");
+        } catch (Exception cause) {
+            throw CommonException.IMAGE_SERVER_ERROR.toException("IMAGE_UPLOAD_FAILED", cause);
         }
     }
 
     @Override
     public URL find(String key) {
         if (!exists(key))
-            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
+            throw CommonException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         try {
             return new URL(minio.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
@@ -61,24 +60,22 @@ public class ImageClientImpl implements ImageClient {
                             .expiry(urlExpirationHours, TimeUnit.HOURS)
                             .build()
             ));
-        } catch (Exception e) {
-            log.error("IMAGE_FIND_FAILED", e);
-            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED");
+        } catch (Exception cause) {
+            throw CommonException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED", cause);
         }
     }
 
     @Override
     public void delete(String key) {
         if (!exists(key))
-            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
+            throw CommonException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         try {
             minio.removeObject(RemoveObjectArgs.builder()
                     .bucket(bucketName)
                     .object(key)
                     .build());
-        } catch (Exception e) {
-            log.error("IMAGE_DELETE_FAILED", e);
-            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED");
+        } catch (Exception cause) {
+            throw CommonException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED", cause);
         }
     }
 
@@ -92,9 +89,8 @@ public class ImageClientImpl implements ImageClient {
             for (Result<Item> result : results) {
                 delete(result.get().objectName());
             }
-        } catch (Exception e) {
-            log.error("IMAGE_DELETE_FAILED", e);
-            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED");
+        } catch (Exception cause) {
+            throw CommonException.IMAGE_SERVER_ERROR.toException("IMAGE_DELETE_FAILED", cause);
         }
     }
 }

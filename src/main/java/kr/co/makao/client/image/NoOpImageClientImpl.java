@@ -1,6 +1,6 @@
-package kr.co.makao.client;
+package kr.co.makao.client.image;
 
-import kr.co.makao.exception.ApiException;
+import kr.co.makao.exception.CommonException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +21,7 @@ public class NoOpImageClientImpl implements ImageClient {
     @Override
     public String upload(MultipartFile file, String key) {
         if (exists(key))
-            throw ApiException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
+            throw CommonException.BAD_REQUEST.toException("DUPLICATE_IMAGE_KEY");
         storage.put(key, "mock-url/" + key);
         return key;
     }
@@ -29,19 +29,18 @@ public class NoOpImageClientImpl implements ImageClient {
     @Override
     public URL find(String key) {
         if (!exists(key))
-            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
+            throw CommonException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         try {
             return new URL("http://localhost:8080/" + key);
         } catch (MalformedURLException e) {
-            log.error("IMAGE_FIND_FAILED", e);
-            throw ApiException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED");
+            throw CommonException.IMAGE_SERVER_ERROR.toException("IMAGE_FIND_FAILED");
         }
     }
 
     @Override
     public void delete(String key) {
         if (!exists(key))
-            throw ApiException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
+            throw CommonException.BAD_REQUEST.toException("IMAGE_NOT_FOUND");
         storage.remove(key);
     }
 

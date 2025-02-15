@@ -1,4 +1,4 @@
-package kr.co.makao.client;
+package kr.co.makao.client.image;
 
 import org.springframework.web.multipart.MultipartFile;
 

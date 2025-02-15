@@ -1,4 +1,4 @@
-package kr.co.makao;
+package kr.co.makao.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan(basePackageClasses = EnableCommonJpa.class)
-@EnableJpaRepositories(basePackageClasses = EnableCommonJpa.class)
+@EntityScan("kr.co.makao.entity")
+@EnableJpaRepositories("kr.co.makao.repository")
 @EnableJpaAuditing
 public @interface EnableCommonJpa {
 }
